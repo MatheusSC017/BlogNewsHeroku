@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %} | Album - {{ album.title }}{% endblock %}
+
+{% block content %}
+<section class="container-fluid landing-item gray-bg-color">
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-10 pt-5 pb-5">
+            <h1 class="text-center">{{ album.title }}</h1>
+
+            <form action="{% url 'album:images_create' album.pk %}" method="POST" class="form-field" enctype="multipart/form-data">
+
+                <div class="mb-3">
+                    {{ image_form.image_field }}
+                    <div class="secondary-color">
+                        {{ image_form.image_field.errors }}
+                    </div>
+                </div>
+
+                {% csrf_token %}
+                <div class="text-end">
+                    <button class="btn button-format">
+                        Enviar
+                    </button>
+                </div>
+            </form>
+
+            <form method="POST" action="{% url 'album:images_delete' album.pk %}">
+                <div class="container-fluid card-columns pt-3 pb-3 text-center">
+                    {% for image in images %}
+                    <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
+                        <div class="button-options">
+                            <button onclick="popupForm('update-image-form', 1);
+                                             pkField('update-image-form', {{ image.pk }});
+                                             imageFields({{ image.pk }})"
+                                    type="button">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <button onclick="popupForm('delete-image-form', 1);
+                                             pkField('delete-image-form', {{ image.pk }})"
+                                    type="button">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                            <input type="checkbox"
+                                   name="delete-items"
+                                   value="{{ image.pk }}"
+                                   style="display: none"
+                                   id="check-delete-{{ image.pk }}">
+                            <button onclick="return checkboxSelection({{ image.pk }})">
+                                    <i class="bi bi-check-lg"
+                                       id="checked-icon-delete-{{ image.pk }}"
+                                       style="visibility: hidden"></i>
+                                </label>
+                            </button>
+                        </div>
+                        <img src="{{ image.image.url }}"
+                             alt="{{ image.title }}"
+                             title="{{ image.title }}"
+                             class="card-img-top">
+                    </div>
+                    {% endfor %}
+
+                </div>
+                {% csrf_token %}
+                {% if images.count > 0 %}
+                <div class="text-end w-100">
+                    <button class="btn button-format" onclick="return confirmAction()">
+                        Deletar
+                    </button>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-image-form">
+        <form action="{% url 'album:image_update' album.pk %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                <input class="form-control"
+                       type="text"
+                       name="title"
+                       id="title-image-id"
+                       placeholder="Título da imagem">
+                <label class="form-label"
+                       for="title-image-id">
+                    Título da imagem
+                </label>
+            </div>
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <button class="btn button-format">
+                    Enviar
+                </button>
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('update-image-form', 0)">
+                    Cancelar
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-image-form">
+        <form action="{% url 'album:image_delete' album.pk %}" method="POST" class="form-field">
+
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('delete-image-form', 0)">
+                    Cancelar
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

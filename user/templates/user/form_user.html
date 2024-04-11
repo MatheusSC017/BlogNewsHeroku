@@ -1,0 +1,30 @@
+{% extends 'user/base.html' %}
+
+{% block content_user_page %}
+<h2 class="my-3">{% block action %}{% endblock %}</h2>
+
+<form method="POST" action="" class="form-field">
+    {% for field in form %}
+        <div class="form-floating mb-3">
+            {{ field }}
+            {{ field.label_tag }}
+            <div class="secondary-color">
+            {{ field.errors }}
+            </div>
+            {% if field.help_text %}
+            <p class="help primary-color">{{ field.help_text|safe }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% block additional_content %}{% endblock %}
+
+    {% csrf_token %}
+
+    <div class="text-end mt-3">
+        <button class="btn button-format">
+            Enviar
+        </button>
+    </div>
+</form>
+{% endblock %}

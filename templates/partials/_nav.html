@@ -1,0 +1,57 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark dark-bg-color border-bottom border-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'blog:index' %}">
+            <img src="{% static 'img/white_logo.png' %}" alt="Logo" id="logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'blog:index' %}"><i class="bi bi-house-fill"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'post:blog' %}"><i class="bi bi-newspaper"></i> Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'album:album' %}"><i class="bi bi-image-fill"></i> Galeria</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'search:searches' %}"><i class="bi bi-question"></i> Pesquisas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blog:about' %}"><i class="bi bi-person-fill"></i> Sobre</a>
+                </li>
+                {% if not request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link button-format" href="{% url 'user:login' %}">Login</a>
+                </li>
+                {% else %}
+                <li class="nav-item dropdown">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle h4"></i>
+                        {{ user.first_name }}
+                    </a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        {% if perms.post.view_post %}
+                        <li><a class="dropdown-item" href="{% url 'post:user_blog' %}">Meus Posts</a></li>
+                        {% endif %}
+                        {% if perms.album.view_album %}
+                        <li><a class="dropdown-item" href="{% url 'album:user_album' %}">Meus Albuns</a></li>
+                        {% endif %}
+                        {% if perms.search.view_search %}
+                        <li><a class="dropdown-item" href="{% url 'search:user_search' %}">Minhas Pesquisas</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="{% url 'socialaccount_connections' %}">Conexões</a></li>
+                        <li><a class="dropdown-item" href="{% url 'user:update' %}">Meus dados</a></li>
+                        <li><a class="dropdown-item" href="{% url 'user:logout' %}">Sair</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

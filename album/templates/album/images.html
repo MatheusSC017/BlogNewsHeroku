@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %} | Album - {{ album.title }}{% endblock %}
+
+{% block content %}
+<section class="container-fluid landing-item gray-bg-color">
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-10 pt-5 pb-5">
+            <h1 class="text-center">{{ album.title }}</h1>
+            <div class="text-end">
+                <button class="btn button-format"
+                        onclick="popupForm('report-form', 1)">
+                    Reportar
+                </button>
+            </div>
+
+            <div class="container-fluid card-columns pt-3 pb-3 text-center">
+                {% for image in images %}
+                <div class="card gallery-image position-relative" id="image-{{ image.pk }}">
+                    <img src="{{ image.image.url }}"
+                         alt="{{ image.title }}"
+                         title="{{ image.title }}"
+                         class="card-img-top">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+
+<!-- Report Form -->
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none; width: 400px" id="report-form">
+        <form action="{% url 'album:report' %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                <textarea class="form-control"
+                          placeholder="Deixe sua denúncia aqui"
+                          id="reportTextarea"
+                          name="report-description"></textarea>
+                <label for="reportTextarea">Denúncia</label>
+            </div>
+
+            <input type="hidden" name="primary-key" value="{{ album.pk }}">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format"
+                    onclick="popupForm('report-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load setting_tags %}
+{% load convert_tags %}
+
+{% block head %}
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
+{% endblock %}
+
+{% block title %} | {{ post.title }}{% endblock %}
+
+{% block content %}
+<section class="container-fluid landing-item gray-bg-color pt-5 pb-5">
+
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-xl"></div>
+        <div class="col-xl-8">
+
+            <!-- Details about the post -->
+            <h1 class="text-center dark-color">{{ post.title }}</h1>
+            <div class="d-flex justify-content-center">
+                <div class="w-25 d-flex justify-content-around">
+                    <small>
+                        {{ post.ratting|to_int }} <i class="bi bi-star-fill text-warning"></i>
+                    </small>
+
+                    <small>
+                        {{ post.views }} <i class="bi bi-eye-fill"></i>
+                    </small>
+
+                    <small>
+                        {{ post.comments }} <i class="bi bi-chat-left-text-fill"></i>
+                    </small>
+                </div>
+            </div>
+            <div class="text-end">
+                <button class="btn button-format"
+                        onclick="popupForm('report-form', 1)">
+                    Reportar
+                </button>
+            </div>
+            {% if post.image %}
+            <div class="text-center p-3">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid w-50">
+            </div>
+            {% endif %}
+            <p>
+                {{ post.description|safe }}
+            </p>
+            <p class="text-end">
+                Escrito por:
+                <cite>{{ post.user.first_name }} {{ post.user.last_name }}</cite><br>
+                Publicado:
+                <small>
+                    {{ post.published_date|naturalday|title }}
+                </small>
+            </p>
+
+            <!-- Album option -->
+            {% if post.album %}
+            <div class="text-end mt-3">
+                <a href="{% url 'album:image' post.album.pk %}">
+                    <button class="button-format"><strong>Album</strong></button>
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Avaliation form -->
+            <form method="POST" action="#btn_send_avaliation" id="avaliation-form" class="mt-5">
+                <div class="container d-flex justify-content-center">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="stars">
+
+                                <input class="star star-5" id="star-5" type="radio" name="star" value="5"
+                                    {% if ratting_user == 5 %}checked{% endif %}/>
+                                <label class="star star-5" for="star-5"></label>
+
+                                <input class="star star-4" id="star-4" type="radio" name="star" value="4"
+                                    {% if ratting_user == 4 %}checked{% endif %}/>
+                                <label class="star star-4" for="star-4"></label>
+
+                                <input class="star star-3" id="star-3" type="radio" name="star" value="3"
+                                    {% if ratting_user == 3 %}checked{% endif %}/>
+                                <label class="star star-3" for="star-3"></label>
+
+                                <input class="star star-2" id="star-2" type="radio" name="star" value="2"
+                                    {% if ratting_user == 2 %}checked{% endif %}/>
+                                <label class="star star-2" for="star-2"></label>
+
+                                <input class="star star-1" id="star-1" type="radio" name="star" value="1"
+                                    {% if ratting_user == 1 %}checked{% endif %}/>
+                                <label class="star star-1" for="star-1"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="action" value="ratting-post">
+
+                {% csrf_token %}
+                <div class="text-end">
+                    <input id="btn_send_avaliation" type="submit" class="btn btn-primary button-format" value="Avaliar">
+                </div>
+            </form>
+
+        </div>
+        <div class="col-xl"></div>
+    </div>
+
+    <!-- Registered comments -->
+    <div class="row pt-5">
+        <div class="col-xl"></div>
+        <div class="col-xl-8" id="comments-post">
+            <h2 class="my-3">Comentários {{ post.comments }}</h2>
+
+            {% for comment in comments %}
+            <section class="border-bottom comment position-relative" id="comment-{{ comment.pk }}">
+                {% if comment.user == user %}
+                <div class="button-options">
+                    <button onclick="popupForm('update-comment-form', 1);
+                                                commentField({{ comment.pk }});
+                                                pkField('update-comment-form', {{ comment.pk }})">
+                        <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button onclick="popupForm('delete-comment-form', 1);
+                                     pkField('delete-comment-form', {{ comment.pk }})">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                {% endif %}
+                <h3 class="h5 mb-2 mt-5 dark-color">
+                    {{ comment.user.first_name }} {{ comment.user.last_name}}
+                </h3>
+                <small class="dark-color">{{ comment.edition_date_comment|naturalday|title }}</small>
+                <p class="mb-1">{{ comment.comment }}</p>
+            </section>
+            {% endfor %}
+
+        </div>
+        <div class="col-xl"></div>
+    </div>
+
+    <!-- Comment Form -->
+    <div class="row pt-5">
+        <div class="col-xl"></div>
+        <div class="col-xl-8" id="send-comment">
+            <h2 class="my-3">Deixe um comentário</h2>
+
+            <form method="POST" action="{% url 'comment:comment_create' post.pk %}" class="form-field" id='demo-form'>
+
+                <div class="form-floating">
+                    {{ comment_form.comment }}
+                    {{ comment_form.comment.label_tag }}
+                    <div class="secondary-color">
+                        {{ comment_form.comment.errors }}
+                    </div>
+                </div>
+
+                <input type="hidden" name="action" value="create-comment">
+
+                {% csrf_token %}
+                <div class="text-end mt-3">
+                    <button class="btn button-format g-recaptcha"
+                        data-sitekey="{% recaptcha_site_key %}"
+                        data-callback='onSubmit'>
+                        Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-xl"></div>
+    </div>
+</section>
+
+<!-- Form Update Comment -->
+<section id="popup" style="display: none">
+    <div class="dark-background"></div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="update-comment-form">
+        <form action="{% url 'comment:comment_update' post.pk %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                {{ comment_form.comment }}
+                {{ comment_form.comment.label_tag }}
+                <div class="secondary-color">
+                    {{ comment_form.comment.errors }}
+                </div>
+            </div>
+
+            <input type="hidden" name="action" value="update-comment">
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('update-comment-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none" id="delete-comment-form">
+        <form action="{% url 'comment:comment_delete' post.pk %}" method="POST" class="form-field">
+
+            <input type="hidden" name="action" value="delete-comment">
+            <input type="hidden" name="primary-key">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format secondary-bg-color"
+                    onclick="popupForm('delete-comment-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format primary-bg-color">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="gray-bg-color popup-content p-3 rounded rounded-5" style="display: none; width: 400px" id="report-form">
+        <form action="{% url 'post:report' %}" method="POST" class="form-field">
+
+            <div class="form-floating">
+                <textarea class="form-control"
+                          placeholder="Deixe sua denúncia aqui"
+                          id="reportTextarea"
+                          name="report-description"></textarea>
+                <label for="reportTextarea">Denúncia</label>
+            </div>
+
+            <input type="hidden" name="primary-key" value="{{ post.pk }}">
+
+            {% csrf_token %}
+            <div class="text-end mt-3">
+                <div class="btn button-format"
+                    onclick="popupForm('report-form', 0)">
+                    Cancelar
+                </div>
+                <button class="btn button-format">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

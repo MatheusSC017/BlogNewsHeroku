@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load convert_tags %}
+
+{% block title %} | Pesquisas{% endblock %}
+
+{% block content %}
+
+<section class="container-fluid landing-item gray-bg-color">
+    <div class="row row-cols-1 p-5">
+        {% for search in searches %}
+        <article class="col border border-dark p-3 mb-5">
+            <div class="d-flex position-relative">
+                <div>
+                    <h1 class="h4 dark-color">{{ search.search.description }}</h1>
+                </div>
+                <div class="button-options">
+                    {% if search.status %}
+                        <strong class="rotate-45 search-status dark-color text-center p-2 primary-bg-color rounded rounded-circle">
+                            Aberta
+                        </strong>
+                   {% else %}
+                        <strong class="rotate-45 search-status light-color text-center p-2 secondary-bg-color rounded rounded-circle">
+                            Fechada
+                        </strong>
+                   {% endif %}
+
+                </div>
+            </div>
+
+            {% for option in search.options %}
+            <div class="ms-5 pt-3 pb-3 d-flex border-bottom border-dark">
+                <div class="me-2">
+                    <h2 class="h6">{{ option.response }}</h2>
+                </div>
+                <div class="ms-auto aligment-center">
+                    {% if option.vote|to_int == search.max_vote.vote__max %}
+                        <div class="alternative-counter primary-bg-color dark-color text-center p-2 rounded rounded-circle">
+                            {{ option.vote|to_int }}
+                        </div>
+                    {% else %}
+                        <div class="alternative-counter secondary-bg-color light-color text-center p-2 rounded rounded-circle">
+                            {{ option.vote|to_int }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="text-end">
+                <a href="{% url 'search:search' search.search.pk %}">
+                    <button class="mt-3 rounded gray-bg-color dark-color">
+                        <strong>
+                            {% if search.status %}
+                                Responder
+                            {% else %}
+                                Visualizar
+                            {% endif %}
+                        </strong>
+                    </button>
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
