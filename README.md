@@ -7,7 +7,7 @@
 
 This project is a copy of another project of mine with some modifications to be deployed on Heroku, such as the addition of the Procfile and the configuration of the AWS S3 service. Follow the link to access the original [BlogNews project](https://github.com/MatheusSC017/BlogNews)
 
-Access the website through this [link](https://blognews-a92f5c73f7ee.herokuapp.com/)
+Access the website through this [link](https://blognews-a92f5c73f7ee.herokuapp.com/) (Link temporarily disabled)
 
 ## Requirements
 
